@@ -15,7 +15,11 @@ import {
   ThunderboltOutlined,
 } from '@ant-design/icons';
 
-import { useGetCryptoDetailsQuery } from '../services/cryptoApi';
+import {
+  useGetCryptoDetailsQuery,
+  useGetCryptoHistoryQuery,
+} from '../services/cryptoApi';
+import LineChart from './LineChart';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -24,6 +28,11 @@ const CryptoDetails = () => {
   const { coinId } = useParams();
   const [timePeriod, setTimePeriod] = useState('7d');
   const { data, isFetching } = useGetCryptoDetailsQuery(coinId);
+  const { data: coinHistory } = useGetCryptoHistoryQuery({
+    coinId,
+    timePeriod,
+  });
+
   const cryptoDetails = data?.data?.coin;
 
   if (isFetching) return 'Loading...';
@@ -66,7 +75,7 @@ const CryptoDetails = () => {
       icon: <MoneyCollectOutlined />,
     },
     {
-      title: 'Aprroved Supply',
+      title: 'Approved Supply',
       value: cryptoDetails.approvedSupply ? (
         <CheckOutlined />
       ) : (
@@ -107,7 +116,13 @@ const CryptoDetails = () => {
           <Option key={date}>{date}</Option>
         ))}
       </Select>
-      {/* line chart... */}
+
+      <LineChart
+        coinHistory={coinHistory}
+        currentPrice={millify(cryptoDetails.price)}
+        coinName={cryptoDetails.name}
+      />
+
       <Col className='stats-container'>
         <Col className='coin-value-statistics'>
           <Col className='coin-value-statistics-heading'>
@@ -116,8 +131,8 @@ const CryptoDetails = () => {
             </Title>
             <p>An overview showing the statistics of {cryptoDetails.name}</p>
           </Col>
-          {stats.map(({ icon, title, value }) => (
-            <Col className='coin-stats'>
+          {stats.map(({ icon, title, value, i }) => (
+            <Col className='coin-stats' key={i}>
               <Col className='coin-stats-name'>
                 <Text>{icon}</Text>
                 <Text>{title}</Text>
@@ -133,8 +148,8 @@ const CryptoDetails = () => {
             </Title>
             <p>An overview showing the statistics of all cryptocurrencies.</p>
           </Col>
-          {genericStats.map(({ icon, title, value }) => (
-            <Col className='coin-stats'>
+          {genericStats.map(({ icon, title, value, i }) => (
+            <Col className='coin-stats' key={i}>
               <Col className='coin-stats-name'>
                 <Text>{icon}</Text>
                 <Text>{title}</Text>
