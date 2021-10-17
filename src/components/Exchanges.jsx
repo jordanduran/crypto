@@ -50,7 +50,9 @@ const Exchanges = () => {
                   </Row>
                 }
               >
-                {HTMLReactParser(exchange.description || '')}
+                {HTMLReactParser(
+                  exchange.description || 'No description available.'
+                )}
               </Panel>
             </Collapse>
           </Col>
